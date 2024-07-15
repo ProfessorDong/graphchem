@@ -4,10 +4,16 @@ from dataset import MoleculeDataset
 from tqdm import tqdm
 import numpy as np
 import mlflow.pytorch
+import yaml
 from utils import (count_parameters, gvae_loss, 
         slice_edge_type_from_edge_feats, slice_atom_type_from_node_feats)
 from gvae import GVAE
 from config import DEVICE as device
+
+# Specifically suppress MLflow warnings, you can set the logging level for MLflow:
+import logging
+logging.getLogger("mlflow").setLevel(logging.ERROR)
+
 
 # Load data
 train_dataset = MoleculeDataset(root="data/", filename="HIV_train_oversampled.csv")[:10000]
@@ -75,10 +81,31 @@ def run_one_epoch(data_loader, type, epoch, kl_beta):
     mlflow.log_metric(key=f"{type} KL Divergence", value=float(np.array(all_kldivs).mean()), step=epoch)
     mlflow.pytorch.log_model(model, "model")
 
+# # Run training
+# with mlflow.start_run() as run:
+#     # Load and log conda environment
+#     with open("environment.yml", "r") as f:
+#         conda_env = yaml.safe_load(f)
+#     mlflow.pytorch.log_model(model, "model", conda_env=conda_env)
+    
+#     for epoch in range(100): 
+#         model.train()
+#         run_one_epoch(train_loader, type="Train", epoch=epoch, kl_beta=kl_beta)
+#         if epoch % 5 == 0:
+#             print("Start test epoch...")
+#             model.eval()
+#             run_one_epoch(test_loader, type="Test", epoch=epoch, kl_beta=kl_beta)
+    
+#     # Log final model with conda environment
+#     mlflow.pytorch.log_model(model, "final_model", conda_env=conda_env)
+
 # Run training
 with mlflow.start_run() as run:
-    # Log conda environment
-    mlflow.log_artifact("gvae_env.yaml")
+    # Log custom pip requirements
+    mlflow.log_artifact("pip_requirements.txt")
+    
+    # Log initial model state with custom pip requirements
+    mlflow.pytorch.log_model(model, "initial_model", pip_requirements="pip_requirements.txt")
     
     for epoch in range(100): 
         model.train()
@@ -88,5 +115,5 @@ with mlflow.start_run() as run:
             model.eval()
             run_one_epoch(test_loader, type="Test", epoch=epoch, kl_beta=kl_beta)
     
-    # Log model with conda environment
-    mlflow.pytorch.log_model(model, "model", conda_env="gvae_env.yaml")
+    # Log final model with custom pip requirements
+    mlflow.pytorch.log_model(model, "final_model", pip_requirements="pip_requirements.txt")
