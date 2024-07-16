@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/2ec83a788b434926b14aeffb5b90d249/artifacts
+end_time: 1721089814907
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 2ec83a788b434926b14aeffb5b90d249
+run_name: tasteful-ant-684
+run_uuid: 2ec83a788b434926b14aeffb5b90d249
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1721089805958
+status: 4
+tags: []
+user_id: liang

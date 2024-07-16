@@ -4,7 +4,6 @@ from dataset import MoleculeDataset
 from tqdm import tqdm
 import numpy as np
 import mlflow.pytorch
-import yaml
 from utils import (count_parameters, gvae_loss, 
         slice_edge_type_from_edge_feats, slice_atom_type_from_node_feats)
 from gvae import GVAE
@@ -13,7 +12,6 @@ from config import DEVICE as device
 # Specifically suppress MLflow warnings, you can set the logging level for MLflow:
 import logging
 logging.getLogger("mlflow").setLevel(logging.ERROR)
-
 
 # Load data
 train_dataset = MoleculeDataset(root="data/", filename="HIV_train_oversampled.csv")[:10000]
@@ -29,8 +27,7 @@ print("Model parameters: ", count_parameters(model))
 # Define loss and optimizer
 loss_fn = gvae_loss
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-# kl_beta = 0.5
-kl_beta = 0.001
+kl_beta = 0.001  #0.5
 
 # Train function
 def run_one_epoch(data_loader, type, epoch, kl_beta):
@@ -47,13 +44,13 @@ def run_one_epoch(data_loader, type, epoch, kl_beta):
             # Reset gradients
             optimizer.zero_grad() 
             # Call model
-            triu_logits, node_logits, mu, logvar = model(batch.x.float(), 
-                                                        batch.edge_attr.float(),
-                                                        batch.edge_index, 
-                                                        batch.batch) 
+            triu_logits, node_logits, mu, logvar = model(batch.x.float().to(device), 
+                                                        batch.edge_attr.float().to(device),
+                                                        batch.edge_index.to(device), 
+                                                        batch.batch.to(device)) 
             # Calculate loss and backpropagate
-            edge_targets = slice_edge_type_from_edge_feats(batch.edge_attr.float())
-            node_targets = slice_atom_type_from_node_feats(batch.x.float(), as_index=True)
+            edge_targets = slice_edge_type_from_edge_feats(batch.edge_attr.float().to(device))
+            node_targets = slice_atom_type_from_node_feats(batch.x.float().to(device), as_index=True)
             loss, kl_div = loss_fn(triu_logits, node_logits,
                                    batch.edge_index, edge_targets, 
                                    node_targets, mu, logvar, 
@@ -72,7 +69,7 @@ def run_one_epoch(data_loader, type, epoch, kl_beta):
     
     # Perform sampling
     if type == "Test":
-        generated_mols = model.sample_mols(num=10000)
+        generated_mols = model.sample_mols(num=10000, device=device)
         print(f"Generated {generated_mols} molecules.")
         mlflow.log_metric(key=f"Sampled molecules", value=float(generated_mols), step=epoch)
 
@@ -81,32 +78,8 @@ def run_one_epoch(data_loader, type, epoch, kl_beta):
     mlflow.log_metric(key=f"{type} KL Divergence", value=float(np.array(all_kldivs).mean()), step=epoch)
     mlflow.pytorch.log_model(model, "model")
 
-# # Run training
-# with mlflow.start_run() as run:
-#     # Load and log conda environment
-#     with open("environment.yml", "r") as f:
-#         conda_env = yaml.safe_load(f)
-#     mlflow.pytorch.log_model(model, "model", conda_env=conda_env)
-    
-#     for epoch in range(100): 
-#         model.train()
-#         run_one_epoch(train_loader, type="Train", epoch=epoch, kl_beta=kl_beta)
-#         if epoch % 5 == 0:
-#             print("Start test epoch...")
-#             model.eval()
-#             run_one_epoch(test_loader, type="Test", epoch=epoch, kl_beta=kl_beta)
-    
-#     # Log final model with conda environment
-#     mlflow.pytorch.log_model(model, "final_model", conda_env=conda_env)
-
 # Run training
 with mlflow.start_run() as run:
-    # Log custom pip requirements
-    mlflow.log_artifact("pip_requirements.txt")
-    
-    # Log initial model state with custom pip requirements
-    mlflow.pytorch.log_model(model, "initial_model", pip_requirements="pip_requirements.txt")
-    
     for epoch in range(100): 
         model.train()
         run_one_epoch(train_loader, type="Train", epoch=epoch, kl_beta=kl_beta)
@@ -114,6 +87,3 @@ with mlflow.start_run() as run:
             print("Start test epoch...")
             model.eval()
             run_one_epoch(test_loader, type="Test", epoch=epoch, kl_beta=kl_beta)
-    
-    # Log final model with custom pip requirements
-    mlflow.pytorch.log_model(model, "final_model", pip_requirements="pip_requirements.txt")

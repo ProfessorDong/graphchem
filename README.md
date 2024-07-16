@@ -7,3 +7,4 @@ Note that the model is not fully functioning yet.
 
 Please have a look at the original implementation in tensorflow for further directions:
 https://github.com/seokhokang/graphvae_approx/
+# graphchem

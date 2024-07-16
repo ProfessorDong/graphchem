@@ -35,6 +35,8 @@ class MoleculeDataset(Dataset):
     @property
     def processed_file_names(self):
         """ If these files are found in raw_dir, processing is skipped """
+        if not os.path.exists(self.processed_dir):
+            os.makedirs(self.processed_dir)
         processed_files = [f for f in os.listdir(self.processed_dir) if not f.startswith("pre")]
     
         if self.test:

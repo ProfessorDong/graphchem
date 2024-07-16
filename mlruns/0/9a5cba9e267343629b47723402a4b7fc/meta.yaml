@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/9a5cba9e267343629b47723402a4b7fc/artifacts
+end_time: 1721090254794
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 9a5cba9e267343629b47723402a4b7fc
+run_name: entertaining-roo-308
+run_uuid: 9a5cba9e267343629b47723402a4b7fc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1721090140661
+status: 4
+tags: []
+user_id: liang

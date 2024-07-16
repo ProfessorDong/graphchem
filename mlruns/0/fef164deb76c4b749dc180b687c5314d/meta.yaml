@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/fef164deb76c4b749dc180b687c5314d/artifacts
+end_time: 1721096241907
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: fef164deb76c4b749dc180b687c5314d
+run_name: respected-shark-77
+run_uuid: fef164deb76c4b749dc180b687c5314d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1721094090372
+status: 3
+tags: []
+user_id: liang

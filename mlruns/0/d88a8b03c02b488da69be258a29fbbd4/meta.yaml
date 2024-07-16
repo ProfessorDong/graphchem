@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/d88a8b03c02b488da69be258a29fbbd4/artifacts
+end_time: 1721090133391
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: d88a8b03c02b488da69be258a29fbbd4
+run_name: amusing-wolf-301
+run_uuid: d88a8b03c02b488da69be258a29fbbd4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1721089878218
+status: 4
+tags: []
+user_id: liang

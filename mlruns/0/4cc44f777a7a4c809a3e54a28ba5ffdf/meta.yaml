@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/4cc44f777a7a4c809a3e54a28ba5ffdf/artifacts
+end_time: 1721089222831
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 4cc44f777a7a4c809a3e54a28ba5ffdf
+run_name: shivering-bug-958
+run_uuid: 4cc44f777a7a4c809a3e54a28ba5ffdf
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1721089211011
+status: 4
+tags: []
+user_id: liang

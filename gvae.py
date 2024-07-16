@@ -131,7 +131,7 @@ class GVAE(nn.Module):
             # Get standard deviation
             std = torch.exp(logvar)
             # Returns random numbers from a normal distribution
-            eps = torch.randn_like(std)
+            eps = torch.randn_like(std).to(mu.device)
             # Return sampled values
             return eps.mul(std).add_(mu)
         else:
@@ -148,33 +148,33 @@ class GVAE(nn.Module):
         return triu_logits, node_logits, mu, logvar
 
     
-    def sample_mols(self, num=10000):
+    def sample_mols(self, num=10000, device='cpu'):
         print("Sampling molecules ... ")
 
         n_valid = 0
         # Sample molecules and check if they are valid
         for _ in tqdm(range(num)):
             # Sample latent space
-            z = torch.randn(1, self.latent_embedding_size)
+            z = torch.randn(1, self.latent_embedding_size).to(device)
 
             # Get model output (this could also be batched)
-            dummy_batch_index = torch.Tensor([0]).int()
+            dummy_batch_index = torch.Tensor([0]).int().to(device)
             triu_logits, node_logits = self.decode(z, dummy_batch_index)
 
             # Reshape triu predictions 
             edge_matrix_shape = (int((MAX_MOLECULE_SIZE * (MAX_MOLECULE_SIZE - 1))/2), len(SUPPORTED_EDGES) + 1) 
             triu_preds_matrix = triu_logits.reshape(edge_matrix_shape)
-            triu_preds = torch.argmax(triu_preds_matrix, dim=1)
+            triu_preds = torch.argmax(triu_preds_matrix, dim=1).to(device)
 
             # Reshape node predictions
             node_matrix_shape = (MAX_MOLECULE_SIZE, (len(SUPPORTED_ATOMS) + 1)) 
             node_preds_matrix = node_logits.reshape(node_matrix_shape)
-            node_preds = torch.argmax(node_preds_matrix[:, :9], dim=1)
+            node_preds = torch.argmax(node_preds_matrix[:, :9], dim=1).to(device)
             
             # Get atomic numbers 
-            node_preds_one_hot = to_one_hot(node_preds, options=ATOMIC_NUMBERS)
-            atom_numbers_dummy = torch.Tensor(ATOMIC_NUMBERS).repeat(node_preds_one_hot.shape[0], 1)
-            atom_types = torch.masked_select(atom_numbers_dummy, node_preds_one_hot.bool())
+            node_preds_one_hot = to_one_hot(node_preds, options=ATOMIC_NUMBERS).to(device)
+            atom_numbers_dummy = torch.Tensor(ATOMIC_NUMBERS).repeat(node_preds_one_hot.shape[0], 1).to(device)
+            atom_types = torch.masked_select(atom_numbers_dummy, node_preds_one_hot.bool()).to(device)
 
             # Attempt to create valid molecule
             smiles, _ = graph_representation_to_molecule(atom_types, triu_preds.float())
