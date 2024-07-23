@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/055e68f886824c92af23b8a3307793e5/artifacts
+end_time: 1721147462718
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 055e68f886824c92af23b8a3307793e5
+run_name: blushing-horse-802
+run_uuid: 055e68f886824c92af23b8a3307793e5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1721147259522
+status: 4
+tags: []
+user_id: liang

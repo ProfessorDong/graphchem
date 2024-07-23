@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/dcd7d4cff8f2460c9fbf0c0ca3c9873e/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: dcd7d4cff8f2460c9fbf0c0ca3c9873e
+run_name: entertaining-doe-896
+run_uuid: dcd7d4cff8f2460c9fbf0c0ca3c9873e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1721747646906
+status: 1
+tags: []
+user_id: liang
