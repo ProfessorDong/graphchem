@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/fbae905dc1a54ecf8547df8f1488c7f9/artifacts
+end_time: 1722977392995
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: fbae905dc1a54ecf8547df8f1488c7f9
+run_name: gifted-roo-761
+run_uuid: fbae905dc1a54ecf8547df8f1488c7f9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722977282295
+status: 4
+tags: []
+user_id: liang

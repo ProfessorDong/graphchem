@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/2e99fcef95db465aa99a86690011facc/artifacts
+end_time: 1722980163886
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 2e99fcef95db465aa99a86690011facc
+run_name: enchanting-shad-582
+run_uuid: 2e99fcef95db465aa99a86690011facc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722977419630
+status: 4
+tags: []
+user_id: liang

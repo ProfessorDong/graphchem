@@ -1,5 +1,5 @@
 artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/dcd7d4cff8f2460c9fbf0c0ca3c9873e/artifacts
-end_time: null
+end_time: 1721751496686
 entry_point_name: ''
 experiment_id: '0'
 lifecycle_stage: active
@@ -10,6 +10,6 @@ source_name: ''
 source_type: 4
 source_version: ''
 start_time: 1721747646906
-status: 1
+status: 3
 tags: []
 user_id: liang

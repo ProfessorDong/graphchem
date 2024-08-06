@@ -1,0 +1,15 @@
+artifact_uri: file:///home/liang/Workspace/graphchem/mlruns/0/d4de003c1dc04f859b463f7c672c8b0e/artifacts
+end_time: 1722985031816
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: d4de003c1dc04f859b463f7c672c8b0e
+run_name: abrasive-sow-383
+run_uuid: d4de003c1dc04f859b463f7c672c8b0e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722980807110
+status: 4
+tags: []
+user_id: liang

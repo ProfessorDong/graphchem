@@ -148,10 +148,10 @@ class GVAE(nn.Module):
         return triu_logits, node_logits, mu, logvar
 
     
-    def sample_mols(self, num=10000, device='cpu'):
+    def sample_mols(self, num=100, device='cpu'):
         print("Sampling molecules ... ")
 
-        n_valid = 0
+        valid_mols = []
         # Sample molecules and check if they are valid
         for _ in tqdm(range(num)):
             # Sample latent space
@@ -182,5 +182,5 @@ class GVAE(nn.Module):
             # A dot means disconnected
             if smiles and "." not in smiles:
                 print("Successfully generated: ", smiles)
-                n_valid += 1    
-        return n_valid
+                valid_mols.append(smiles)
+        return valid_mols, len(valid_mols)

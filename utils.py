@@ -2,6 +2,7 @@ from torch_geometric.utils import to_dense_adj
 import torch
 from rdkit import Chem
 from rdkit import RDLogger 
+from rdkit.Chem import Descriptors
 from config import DEVICE as device
 from config import (SUPPORTED_ATOMS, SUPPORTED_EDGES, MAX_MOLECULE_SIZE, ATOMIC_NUMBERS,
                     DISABLE_RDKIT_WARNINGS)
@@ -348,3 +349,21 @@ def graph_representation_to_molecule(node_types, adjacency_triu):
 
     # TODO: Visualize and save (use deepchem smiles_to_image)
     return smiles, mol
+
+
+def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    return Descriptors.MolLogP(mol) if mol else None
+
+def evaluate_generated_mols(generated_smiles, target_smiles):
+    generated_logp = [calculate_logp(s) for s in generated_smiles if calculate_logp(s) is not None]
+    target_logp = [calculate_logp(s) for s in target_smiles if calculate_logp(s) is not None]
+    
+    avg_gen_logp = sum(generated_logp) / len(generated_logp) if generated_logp else 0
+    avg_target_logp = sum(target_logp) / len(target_logp) if target_logp else 0
+    
+    return {
+        "avg_generated_logp": avg_gen_logp,
+        "avg_target_logp": avg_target_logp,
+        "logp_difference": abs(avg_gen_logp - avg_target_logp)
+    }

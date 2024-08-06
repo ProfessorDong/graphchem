@@ -1,11 +1,12 @@
 import torch
-from torch_geometric.data import DataLoader
+from torch_geometric.loader import DataLoader
 from dataset import MoleculeDataset
 from tqdm import tqdm
 import numpy as np
 import mlflow.pytorch
 from utils import (count_parameters, gvae_loss, 
-        slice_edge_type_from_edge_feats, slice_atom_type_from_node_feats)
+        slice_edge_type_from_edge_feats, slice_atom_type_from_node_feats,
+        evaluate_generated_mols)
 from gvae import GVAE
 from config import DEVICE as device
 
@@ -14,8 +15,16 @@ import logging
 logging.getLogger("mlflow").setLevel(logging.ERROR)
 
 # Load data
-train_dataset = MoleculeDataset(root="data/", filename="HIV_train_oversampled.csv")[:10000]
-test_dataset = MoleculeDataset(root="data/", filename="HIV_test.csv", test=True)[:1000]
+# train_dataset = MoleculeDataset(root="data/", filename="HIV_train_oversampled.csv")[:10000]
+# test_dataset = MoleculeDataset(root="data/", filename="HIV_test.csv", test=True)[:1000]
+# train_dataset = MoleculeDataset(root="data/", filename="Log_P_modified_with_effective.csv")[:800]
+# test_dataset = MoleculeDataset(root="data/", filename="Log_P_modified_with_effective.csv", test=True)[801:]
+
+train_dataset = MoleculeDataset(root="data/", filename="Log_P_modified_with_effective.csv")
+train_dataset = [data for data in train_dataset if data.y == 1]
+test_dataset = MoleculeDataset(root="data/", filename="Log_P_modified_with_effective.csv", test=True)
+test_dataset = [data for data in test_dataset if data.y == 1]
+
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
@@ -69,9 +78,11 @@ def run_one_epoch(data_loader, type, epoch, kl_beta):
     
     # Perform sampling
     if type == "Test":
-        generated_mols = model.sample_mols(num=10000, device=device)
-        print(f"Generated {generated_mols} molecules.")
-        mlflow.log_metric(key=f"Sampled molecules", value=float(generated_mols), step=epoch)
+        generated_mols, num_valid = model.sample_mols(num=100, device=device)
+        valid_ratio = num_valid / 100
+        print(f"Generated {generated_mols} valid molecules out of 100 attempts.")
+        mlflow.log_metric(key=f"Valid Generation Ratio", value=valid_ratio, step=epoch)
+    
 
     print(f"{type} epoch {epoch} loss: ", np.array(all_losses).mean())
     mlflow.log_metric(key=f"{type} Epoch Loss", value=float(np.array(all_losses).mean()), step=epoch)
@@ -80,10 +91,16 @@ def run_one_epoch(data_loader, type, epoch, kl_beta):
 
 # Run training
 with mlflow.start_run() as run:
-    for epoch in range(100): 
+    for epoch in range(100):
         model.train()
         run_one_epoch(train_loader, type="Train", epoch=epoch, kl_beta=kl_beta)
         if epoch % 5 == 0:
-            print("Start test epoch...")
+            print("Start evaluation...")
             model.eval()
-            run_one_epoch(test_loader, type="Test", epoch=epoch, kl_beta=kl_beta)
+            generated_mols, _ = model.sample_mols(num=100, device=device)
+            eval_metrics = evaluate_generated_mols(generated_mols, [data.smiles for data in train_dataset])
+            mlflow.log_metrics(eval_metrics, step=epoch)
+            if test_loader:
+                run_one_epoch(test_loader, type="Test", epoch=epoch, kl_beta=kl_beta)
+            else:
+                print("Skipping test evaluation due to lack of test data.")
